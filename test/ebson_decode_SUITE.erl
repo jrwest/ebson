@@ -19,6 +19,7 @@
 	 empty_doc/1, 
 	 one_key_doc/1,
 	 three_key_doc/1,
+	 complex_doc/1,
 
 	 %% DETECTS GROUP TESTS
 	 detect_double/1, 
@@ -66,7 +67,7 @@ groups() ->
        decode_document, decode_array]},
      {documents, 
       [shuffle],
-      [empty_doc, one_key_doc, three_key_doc]}].
+      [empty_doc, one_key_doc, three_key_doc, complex_doc]}].
 
 all() ->
     [{group, detects}, {group, values}, valid_key, {group, documents}].
@@ -120,7 +121,7 @@ detect_int64(_) ->
 %%%-------------------------------------------------------------------
 decode_double(_) ->
     DblBin = <<174,71,225,122,20,174,243,63>>,
-    {1.23, <<>>} = ebson_decode:value(double, DblBin).
+    {1.23, <<>>} = ebson_decode:value(float, DblBin).
 
 decode_string(_) ->
     StrBin = <<3:1/integer-little-unit:32, 104, 104, 0>>,
@@ -178,6 +179,16 @@ three_key_doc(_) ->
     [{<<"h">>, <<"hh">>},
      {<<"i">>, <<"ii">>},
      {<<"j">>, <<"jj">>}] = ebson_decode:document(EncDoc).
+
+complex_doc(_) -> % TODO refactor EncDoc here to some config or something
+    EncDoc = <<83,0,0,0,1,97,0,174,71,225,122,20,174,243,63,2,98,0,3,0,0,0,98,98,0,3,99,0,
+	       36,0,0,0,4,97,97,0,27,0,0,0,2,48,0,4,0,0,0,97,97,97,0,2,49,0,4,0,0,0,98,98,
+	       98,0,0,0,16,100,0,50,0,0,0,18,101,0,194,136,114,252,0,0,0,0,0>>,
+    [{<<"a">>, 1.23}, 
+     {<<"b">>, <<"bb">>}, 
+     {<<"c">>, [{<<"aa">>, [<<"aaa">>, <<"bbb">>]}]}, 
+     {<<"d">>, 50}, 
+     {<<"e">>, 4235364546}] = ebson_decode:document(EncDoc).
 
 %%%-------------------------------------------------------------------
 %%% UNGROUPED TESTS
