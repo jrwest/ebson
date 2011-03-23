@@ -42,6 +42,8 @@
 	 decode_null/1,
 	 decode_int32/1,
 	 decode_int64/1,
+	 decode_document/1,
+	 decode_array/1,
 
 	 %% NON-GROUPED TESTS
 	 valid_key/1
@@ -60,7 +62,8 @@ groups() ->
       [shuffle],
       [decode_string, decode_double, decode_binary, 
        decode_bool_t, decode_bool_f, decode_utc,
-       decode_null, decode_int32, decode_int64]},
+       decode_null, decode_int32, decode_int64, 
+       decode_document, decode_array]},
      {documents, 
       [shuffle],
       [empty_doc, one_key_doc, three_key_doc]}].
@@ -110,7 +113,7 @@ detect_int32(_) ->
 
 detect_int64(_) ->
     EncBin = <<18, 104, 0, 1, 0, 0, 0, 1, 0, 0, 0>>,
-    int64 = ebson_decode:field_type(EncBin).
+    int64 = ebson_decode:field_type(EncBin).    
 
 %%%-------------------------------------------------------------------
 %%% VALUES TESTS
@@ -151,6 +154,13 @@ decode_int64(_) ->
     Int64Bin = <<1, 2, 3, 4, 5, 6, 7, 8>>,
     {578437695752307201, <<>>} = ebson_decode:value(int64, Int64Bin).
      
+decode_document(_) ->
+    DocBin = <<5, 0, 0, 0, 0>>,
+    {[], <<>>} = ebson_decode:value(document, DocBin).
+
+decode_array(_) ->
+    ArrBin = <<32,0,0,0,2,48,0,2,0,0,0,97,0,2,49,0,2,0,0,0,98,0,2,50,0,2,0,0,0,99,0,0>>,
+    {[<<"a">>, <<"b">>, <<"c">>], <<>>} = ebson_decode:value(array, ArrBin).
 
 %%%-------------------------------------------------------------------
 %%% DOCUMENTS TESTS

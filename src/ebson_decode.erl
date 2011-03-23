@@ -60,6 +60,15 @@ value(string, <<Size:1/integer-little-unit:32, Str/binary>>) ->
     StrSize = Size-1,
     <<Value:StrSize/binary, 0, Rest/binary>> = Str,
     {Value, Rest};
+value(document, <<Size:1/integer-little-signed-unit:32, Rest/binary>>) ->
+    DocSize = Size-4,
+    <<Doc:DocSize/binary-unit:8, Tail/binary>> = Rest,
+    {document(<<Size:1/integer-little-signed-unit:32, Doc:DocSize/binary>>), Tail};
+value(array, <<Size:1/integer-little-signed-unit:32, Rest/binary>>) ->
+    ArrSize = Size-4,
+    <<Doc:ArrSize/binary-unit:8, Tail/binary>> = Rest,
+    DecDoc = document(<<Size:1/integer-little-signed-unit:32, Doc:ArrSize/binary>>),
+    {[Val || {_IdxKey, Val} <- DecDoc], Tail};
 value(binary, <<Size:1/integer-little-unit:32, _SubType:1/integer-little-unit:8, Bin/binary>>) ->
     <<Value:Size/binary, Rest/binary>> = Bin,
     {Value, Rest};
