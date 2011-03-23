@@ -33,6 +33,16 @@ field_type(<<4, _/binary>>) ->
     array;
 field_type(<<5, _/binary>>) ->
     binary;
+field_type(<<8, _/binary>>) ->
+    bool;
+field_type(<<9, _/binary>>) ->
+    unix_time;
+field_type(<<10, _/binary>>) ->
+    null;
+field_type(<<16, _/binary>>) ->
+    int32;
+field_type(<<18, _/binary>>) ->
+    int64;
 field_type(Bin) when is_binary(Bin) ->
     throw(ebson_unknown_fieldtype).
 

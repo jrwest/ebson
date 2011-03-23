@@ -26,6 +26,11 @@
 	 detect_document/1,
 	 detect_array/1,
 	 detect_binary/1,
+	 detect_bool/1,
+	 detect_utc/1,
+	 detect_null/1,
+	 detect_int32/1,
+	 detect_int64/1,
 	 
 	 %% VALUES GROUP TESTS
 	 decode_double/1,
@@ -42,7 +47,9 @@
 groups() ->
     [{detects,
       [shuffle],
-      [detect_double, detect_string, detect_document, detect_array, detect_binary]},
+      [detect_double, detect_string, detect_document, 
+       detect_array, detect_binary, detect_bool, 
+       detect_utc, detect_null, detect_int32, detect_int64]},
      {values, 
       [shuffle],
       [decode_string, decode_double, decode_binary]},
@@ -77,6 +84,25 @@ detect_binary(_) ->
     EncBin = <<5, 104, 0, 1, 0, 1>>,
     binary = ebson_decode:field_type(EncBin).
 
+detect_bool(_) ->
+    EncBin = <<8, 104, 0, 0>>,
+    bool = ebson_decode:field_type(EncBin).
+
+detect_utc(_) ->
+    EncBin = <<9, 104, 0, 1, 2, 3, 4, 5, 6, 7, 8>>,
+    unix_time = ebson_decode:field_type(EncBin).
+
+detect_null(_) ->
+    EncBin = <<10, 104, 0>>,
+    null = ebson_decode:field_type(EncBin).
+
+detect_int32(_) ->
+    EncBin = <<16, 104, 0, 1, 0, 0, 0>>,
+    int32 = ebson_decode:field_type(EncBin).
+
+detect_int64(_) ->
+    EncBin = <<18, 104, 0, 1, 0, 0, 0, 1, 0, 0, 0>>,
+    int64 = ebson_decode:field_type(EncBin).
 
 %%%-------------------------------------------------------------------
 %%% VALUES TESTS
