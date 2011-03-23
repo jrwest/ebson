@@ -44,10 +44,14 @@ key(<<0, Rest/binary>>, Acc) ->
 key(<<Byte:1/unit:8, Rest/binary>>, Acc) ->
     key(Rest, <<Acc/binary, Byte>>).
 
-
+value(double, <<Value:8/little-float-unit:8, Rest/binary>>) ->
+    {Value, Rest};    
 value(string, <<Size:1/integer-little-unit:32, Str/binary>>) ->
     StrSize = Size-1,
     <<Value:StrSize/binary, 0, Rest/binary>> = Str,
+    {Value, Rest};
+value(binary, <<Size:1/integer-little-unit:32, _SubType:1/integer-little-unit:8, Bin/binary>>) ->
+    <<Value:Size/binary, Rest/binary>> = Bin,
     {Value, Rest}.
 		  
 next_key_val(Type = string, Bin) when is_binary(Bin) ->
