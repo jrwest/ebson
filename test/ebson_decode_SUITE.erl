@@ -36,6 +36,12 @@
 	 decode_double/1,
 	 decode_string/1,
 	 decode_binary/1,
+	 decode_bool_t/1,
+	 decode_bool_f/1,
+	 decode_utc/1,
+	 decode_null/1,
+	 decode_int32/1,
+	 decode_int64/1,
 
 	 %% NON-GROUPED TESTS
 	 valid_key/1
@@ -52,7 +58,9 @@ groups() ->
        detect_utc, detect_null, detect_int32, detect_int64]},
      {values, 
       [shuffle],
-      [decode_string, decode_double, decode_binary]},
+      [decode_string, decode_double, decode_binary, 
+       decode_bool_t, decode_bool_f, decode_utc,
+       decode_null, decode_int32, decode_int64]},
      {documents, 
       [shuffle],
       [empty_doc, one_key_doc, three_key_doc]}].
@@ -118,7 +126,31 @@ decode_string(_) ->
 decode_binary(_) ->
     BinBin = <<4, 0, 0, 0, 0, 1, 2, 3, 4>>, %% 0 is intentional. it is the subtype
     {<<1, 2, 3, 4>>, <<>>} = ebson_decode:value(binary, BinBin).
-	
+
+decode_bool_t(_) ->
+    BoolTBin = <<1>>,
+    {true, <<>>} = ebson_decode:value(bool, BoolTBin).
+
+decode_bool_f(_) ->
+    BoolFBin = <<0>>,
+    {false, <<>>} = ebson_decode:value(bool, BoolFBin).
+
+decode_utc(_) ->
+    UTCBin = <<1, 2, 3, 4, 5, 6, 7, 8>>,
+    {578437695752307201, <<>>} = ebson_decode:value(utc, UTCBin).
+
+decode_null(_) ->
+    NullBin = <<1, 2>>,
+    {null, <<1, 2>>} = ebson_decode:value(null, NullBin).
+
+decode_int32(_) ->
+    Int32Bin = <<1, 2, 3, 4>>,
+    {67305985, <<>>} = ebson_decode:value(int32, Int32Bin).	
+
+decode_int64(_) ->
+    Int64Bin = <<1, 2, 3, 4, 5, 6, 7, 8>>,
+    {578437695752307201, <<>>} = ebson_decode:value(int64, Int64Bin).
+     
 
 %%%-------------------------------------------------------------------
 %%% DOCUMENTS TESTS

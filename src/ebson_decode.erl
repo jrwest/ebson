@@ -62,7 +62,19 @@ value(string, <<Size:1/integer-little-unit:32, Str/binary>>) ->
     {Value, Rest};
 value(binary, <<Size:1/integer-little-unit:32, _SubType:1/integer-little-unit:8, Bin/binary>>) ->
     <<Value:Size/binary, Rest/binary>> = Bin,
-    {Value, Rest}.
+    {Value, Rest};
+value(bool, <<1, Rest/binary>>) ->
+    {true, Rest};
+value(bool, <<0, Rest/binary>>) ->
+    {false, Rest};
+value(utc, <<UnixTime:8/integer-little-signed-unit:8, Rest/binary>>) ->
+    {UnixTime, Rest};
+value(null, Rest) ->
+    {null, Rest};
+value(int32, <<Int:4/integer-little-signed-unit:8, Rest/binary>>) ->
+    {Int, Rest};
+value(int64, <<Int:8/integer-little-signed-unit:8, Rest/binary>>) ->
+    {Int, Rest}.
 		  
 next_key_val(Type = string, Bin) when is_binary(Bin) ->
     {Key, Rest} = key(Bin),
