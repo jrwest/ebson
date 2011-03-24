@@ -71,7 +71,7 @@ value(array, <<Size:1/integer-little-signed-unit:32, Rest/binary>>) ->
     {[Val || {_IdxKey, Val} <- DecDoc], Tail};
 value(binary, <<Size:1/integer-little-unit:32, _SubType:1/integer-little-unit:8, Bin/binary>>) ->
     <<Value:Size/binary, Rest/binary>> = Bin,
-    {Value, Rest};
+    {{binary, Value}, Rest};
 value(bool, <<1, Rest/binary>>) ->
     {true, Rest};
 value(bool, <<0, Rest/binary>>) ->

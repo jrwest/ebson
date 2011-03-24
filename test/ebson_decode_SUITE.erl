@@ -129,7 +129,7 @@ decode_string(_) ->
 
 decode_binary(_) ->
     BinBin = <<4, 0, 0, 0, 0, 1, 2, 3, 4>>, %% 0 is intentional. it is the subtype
-    {<<1, 2, 3, 4>>, <<>>} = ebson_decode:value(binary, BinBin).
+    {{binary, <<1, 2, 3, 4>>}, <<>>} = ebson_decode:value(binary, BinBin).
 
 decode_bool_t(_) ->
     BoolTBin = <<1>>,
