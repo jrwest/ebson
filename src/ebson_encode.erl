@@ -22,7 +22,34 @@ document([{Key, Val} | Doc], Bin) ->
     document(Doc, append_key_val(Key, Val, Bin)).
 
 field_flag(Val) when is_float(Val) ->
-    1.
+    1;
+field_flag(Val) when is_binary(Val)
+		     orelse Val == []
+		     orelse (is_list(Val) 
+			     andalso length(Val) > 0 
+			     andalso is_integer(hd(Val))) ->
+    2;
+field_flag([{_,_}|_]=_Val) ->
+    3;
+field_flag(Val) when is_list(Val) ->
+    4;
+field_flag({array, Val}) when is_list(Val) ->
+    4;
+field_flag({binary, Val}) when is_binary(Val) ->
+    5;
+field_flag(Val) when is_atom(Val) 
+		     andalso (Val =:= true orelse Val =:= false) ->
+    8;
+field_flag({unix_time, Val}) when is_integer(Val) ->
+    9;
+field_flag(undefined) ->
+    10;
+field_flag(Val) when is_integer(Val) 
+		     andalso Val >= -2147483648 
+		     andalso Val =< 2147483647 ->
+    16;
+field_flag(Val) when is_integer(Val) ->
+    18.
 
 key(Key) when is_binary(Key) ->
     <<Key/binary, 0>>.

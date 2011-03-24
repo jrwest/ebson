@@ -19,8 +19,20 @@
 	 empty_doc/1, 
 	 one_key_doc/1,
 
-	 %% DETECTS GROUPS TESTS
+	 %% DETECTS GROUP TESTS
 	 detect_float/1,
+	 detect_string_binary/1,
+	 detect_string_list/1,
+	 detect_document/1,
+	 detect_implicit_array/1,
+	 detect_explicit_array/1,
+	 detect_binary/1,
+	 detect_bool_t/1,
+	 detect_bool_f/1,
+	 detect_unix_time/1,
+	 detect_null/1,
+	 detect_int32/1,
+	 detect_int64/1,
 
 	 %% VALUES GROUP TESTS
 	 float_val/1,
@@ -38,7 +50,11 @@ groups() ->
       [float_val]},
      {detects, 
       [shuffle],
-      [detect_float]},
+      [detect_float, detect_string_binary, detect_string_list,
+       detect_document, detect_implicit_array, detect_explicit_array,
+       detect_binary, detect_bool_t, detect_bool_f,
+       detect_unix_time, detect_null, detect_int32,
+       detect_int64]},
      {documents,
       [shuffle],
       [empty_doc, one_key_doc]}].
@@ -60,7 +76,53 @@ detect_float(_) ->
     Val = 1.23,
     1 = ebson_encode:field_flag(Val).
 	
+detect_string_binary(_) ->
+    Val = <<"abc">>,
+    2 = ebson_encode:field_flag(Val).
 
+detect_string_list(_) ->
+    Val = "abc",
+    2 = ebson_encode:field_flag(Val).
+
+detect_document(_) ->
+    Val = [{a, b}],
+    3 = ebson_encode:field_flag(Val).
+
+detect_implicit_array(_) ->
+    Val = [<<"a">>],
+    4 = ebson_encode:field_flag(Val).
+
+detect_explicit_array(_) ->
+    Val = {array, [1]},
+    4 = ebson_encode:field_flag(Val).
+
+detect_binary(_) ->
+    Val = {binary, <<1, 2>>},
+    5 = ebson_encode:field_flag(Val).
+
+detect_bool_t(_) ->
+    Val = true,
+    8 = ebson_encode:field_flag(Val).
+
+detect_bool_f(_) ->
+    Val = false,
+    8 = ebson_encode:field_flag(Val).
+
+detect_unix_time(_) ->
+    Val = {unix_time, 456534365475},
+    9 = ebson_encode:field_flag(Val).
+
+detect_null(_) ->
+    Val = undefined,
+    10 = ebson_encode:field_flag(Val).
+
+detect_int32(_) ->
+    Val = 1,
+    16 = ebson_encode:field_flag(Val).
+
+detect_int64(_) ->
+    Val = 21435432543676,
+    18 = ebson_encode:field_flag(Val).
 
 %%%-------------------------------------------------------------------
 %%% DOCUMENTS TESTS
