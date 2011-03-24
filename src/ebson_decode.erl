@@ -79,7 +79,7 @@ value(bool, <<0, Rest/binary>>) ->
 value(unix_time, <<UnixTime:8/integer-little-signed-unit:8, Rest/binary>>) ->
     {{unix_time, UnixTime}, Rest};
 value(null, Rest) ->
-    {null, Rest};
+    {undefined, Rest};
 value(int32, <<Int:4/integer-little-signed-unit:8, Rest/binary>>) ->
     {Int, Rest};
 value(int64, <<Int:8/integer-little-signed-unit:8, Rest/binary>>) ->

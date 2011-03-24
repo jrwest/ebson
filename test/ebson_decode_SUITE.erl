@@ -145,7 +145,7 @@ decode_utc(_) ->
 
 decode_null(_) ->
     NullBin = <<1, 2>>,
-    {null, <<1, 2>>} = ebson_decode:value(null, NullBin).
+    {undefined, <<1, 2>>} = ebson_decode:value(null, NullBin).
 
 decode_int32(_) ->
     Int32Bin = <<1, 2, 3, 4>>,
