@@ -141,7 +141,7 @@ decode_bool_f(_) ->
 
 decode_utc(_) ->
     UTCBin = <<1, 2, 3, 4, 5, 6, 7, 8>>,
-    {578437695752307201, <<>>} = ebson_decode:value(utc, UTCBin).
+    {{unix_time, 578437695752307201}, <<>>} = ebson_decode:value(unix_time, UTCBin).
 
 decode_null(_) ->
     NullBin = <<1, 2>>,
