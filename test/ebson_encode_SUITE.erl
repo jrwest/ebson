@@ -18,6 +18,7 @@
 	 %% DOCUMENTS GROUP TESTS
 	 empty_doc/1, 
 	 one_key_doc/1,
+	 three_key_doc/1,
 
 	 %% DETECTS GROUP TESTS
 	 detect_float/1,
@@ -36,6 +37,8 @@
 
 	 %% VALUES GROUP TESTS
 	 float_val/1,
+	 string_binary_val/1,
+	 string_list_val/1,
 
 	 %% NON-GROUPED TESTS
 	 binary_key/1
@@ -47,7 +50,7 @@
 groups() ->
     [{values,
       [shuffle],
-      [float_val]},
+      [float_val, string_binary_val, string_list_val]},
      {detects, 
       [shuffle],
       [detect_float, detect_string_binary, detect_string_list,
@@ -57,7 +60,7 @@ groups() ->
        detect_int64]},
      {documents,
       [shuffle],
-      [empty_doc, one_key_doc]}].
+      [empty_doc, one_key_doc, three_key_doc]}].
 
 all() ->
     [binary_key, {group, detects}, {group, values}, {group, documents}].    
@@ -67,8 +70,15 @@ all() ->
 %%%-------------------------------------------------------------------
 float_val(_) ->
     Val = 1.23,
-    <<174,71,225,122,20,174,243,63>> = ebson_encode:value(Val).
+    <<174,71,225,122,20,174,243,63>> = ebson_encode:value(1, Val).
 
+string_binary_val(_) ->
+    Val = <<"abc">>,
+    <<4, 0, 0, 0, $a, $b, $c, 0>> = ebson_encode:value(2, Val).
+
+string_list_val(_) ->
+    Val = "abc",
+    <<4, 0, 0, 0, $a, $b, $c, 0>> = ebson_encode:value(2, Val).
 %%%-------------------------------------------------------------------
 %%% DETECTS TESTS
 %%%-------------------------------------------------------------------
@@ -135,6 +145,9 @@ one_key_doc(_) ->
     Doc = [{<<"a">>, 1.23}],
     Doc = ebson_decode:document(ebson_encode:document(Doc)).
 
+three_key_doc(_) ->
+    Doc = [{<<"a">>, 1.23}, {<<"b">>, <<"abc">>}, {<<"c">>, <<"abc">>}],
+    Doc = ebson_decode:document(ebson_encode:document(Doc)).
 %%%-------------------------------------------------------------------
 %%% UNGROUPED TESTS
 %%%-------------------------------------------------------------------

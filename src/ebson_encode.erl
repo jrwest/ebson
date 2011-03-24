@@ -8,7 +8,7 @@
 %%%-------------------------------------------------------------------
 -module(ebson_encode).
 
--export([document/1, field_flag/1, key/1, value/1]).
+-export([document/1, field_flag/1, key/1, value/2]).
 
 document([]) ->
     <<5, 0, 0, 0, 0>>;
@@ -54,12 +54,17 @@ field_flag(Val) when is_integer(Val) ->
 key(Key) when is_binary(Key) ->
     <<Key/binary, 0>>.
 
-value(Val) when is_float(Val) ->
-    <<Val:8/float-little-unit:8>>.
+value(1, Val) ->
+    <<Val:8/float-little-unit:8>>;
+value(2, Val) when is_binary(Val) ->
+    StrSize = byte_size(Val) + 1,
+    <<StrSize:1/little-signed-integer-unit:32, Val/binary, 0>>;
+value(2, Val) when is_list(Val) ->
+    value(2, list_to_binary(Val)).
 
 append_key_val(Key, Val, Bin) ->
     CurrentSize = byte_size(Bin),
     FieldFlag = field_flag(Val),
     EncKey = key(Key),
-    EncVal = value(Val),
+    EncVal = value(FieldFlag, Val),
     <<Bin:CurrentSize/binary-unit:8, FieldFlag:1/integer-little-signed-unit:8, EncKey/binary, EncVal/binary>>.
