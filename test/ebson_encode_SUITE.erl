@@ -19,6 +19,7 @@
 	 empty_doc/1, 
 	 one_key_doc/1,
 	 three_key_doc/1,
+	 complex_doc/1,
 
 	 %% DETECTS GROUP TESTS
 	 detect_float/1,
@@ -39,18 +40,37 @@
 	 float_val/1,
 	 string_binary_val/1,
 	 string_list_val/1,
+	 binary_val/1,
+	 bool_t_val/1,
+	 bool_f_val/1,
+	 unix_time_val/1,
+	 null_val/1,
+	 int32_val/1,
+	 int64_val/1,
+	 document_val/1,
+	 implicit_array_val/1,
+	 explicit_array_val/1,
 
-	 %% NON-GROUPED TESTS
-	 binary_key/1
+	 %% KEYS GROUP TESTS
+	 binary_key/1,
+	 list_key/1,
+	 integer_key/1,
+	 atom_key/1
 	]).
 
 %%%-------------------------------------------------------------------
 %%% COMMON TEST FUNCTIONS
 %%%-------------------------------------------------------------------
 groups() ->
-    [{values,
+    [{keys, 
       [shuffle],
-      [float_val, string_binary_val, string_list_val]},
+      [binary_key, list_key, integer_key, atom_key]},
+     {values,
+      [shuffle],
+      [float_val, string_binary_val, string_list_val,
+       binary_val, bool_t_val, bool_f_val, unix_time_val,
+       null_val, int32_val, int64_val,
+       document_val, implicit_array_val, explicit_array_val]},
      {detects, 
       [shuffle],
       [detect_float, detect_string_binary, detect_string_list,
@@ -60,10 +80,30 @@ groups() ->
        detect_int64]},
      {documents,
       [shuffle],
-      [empty_doc, one_key_doc, three_key_doc]}].
+      [empty_doc, one_key_doc, three_key_doc, complex_doc]}].
 
 all() ->
-    [binary_key, {group, detects}, {group, values}, {group, documents}].    
+    [{group, keys}, {group, detects}, {group, values}, {group, documents}].    
+
+
+%%%-------------------------------------------------------------------
+%%% KEYS TESTS
+%%%-------------------------------------------------------------------
+binary_key(_) ->
+    Key = <<"a">>,
+    <<$a, 0>> = ebson_encode:key(Key).
+    
+list_key(_) ->
+    Key = "1",
+    <<$1, 0>> = ebson_encode:key(Key).
+
+integer_key(_) ->
+    Key = 1,
+    <<$1, 0>> = ebson_encode:key(Key).
+
+atom_key(_) ->
+    Key = abc,
+    <<$a, $b, $c, 0>> = ebson_encode:key(Key).
 
 %%%-------------------------------------------------------------------
 %%% VALUES TESTS
@@ -79,6 +119,46 @@ string_binary_val(_) ->
 string_list_val(_) ->
     Val = "abc",
     <<4, 0, 0, 0, $a, $b, $c, 0>> = ebson_encode:value(2, Val).
+
+binary_val(_) ->
+    Val = {binary, <<1, 2, 3, 4>>},
+    <<4, 0, 0, 0, 0, 1, 2, 3, 4>> = ebson_encode:value(5, Val).
+
+bool_t_val(_) ->
+    <<1:1/little-integer-unit:8>> = ebson_encode:value(8, true).
+
+bool_f_val(_) ->
+    Val = false,
+    <<0:1/little-integer-unit:8>> = ebson_encode:value(8, false).
+
+unix_time_val(_) ->
+    Val = {unix_time, 578437695752307201},
+    <<1, 2, 3, 4, 5, 6, 7, 8>> = ebson_encode:value(9, Val).
+
+null_val(_) ->
+    Val = undefined,
+    <<>> = ebson_encode:value(10, Val).
+    
+int32_val(_) ->
+    Val = 1,
+    <<1, 0, 0, 0>> = ebson_encode:value(16, Val).
+
+int64_val(_) ->
+    Val = 578437695752307201,
+    <<1, 2, 3, 4, 5, 6, 7, 8>> = ebson_encode:value(18, Val).
+
+document_val(_) ->
+    Val = [],
+    <<5, 0, 0, 0, 0>> = ebson_encode:value(3, Val).
+
+implicit_array_val(_) ->
+    Val = [<<"a">>, <<"b">>],
+    <<23,0,0,0,2,48,0,2,0,0,0,97,0,2,49,0,2,0,0,0,98,0,0>> = ebson_encode:value(4, Val).
+
+explicit_array_val(_) ->
+    Val = {array, [<<"a">>, <<"b">>]},
+    <<23,0,0,0,2,48,0,2,0,0,0,97,0,2,49,0,2,0,0,0,98,0,0>> = ebson_encode:value(4, Val).
+
 %%%-------------------------------------------------------------------
 %%% DETECTS TESTS
 %%%-------------------------------------------------------------------
@@ -148,11 +228,12 @@ one_key_doc(_) ->
 three_key_doc(_) ->
     Doc = [{<<"a">>, 1.23}, {<<"b">>, <<"abc">>}, {<<"c">>, <<"abc">>}],
     Doc = ebson_decode:document(ebson_encode:document(Doc)).
-%%%-------------------------------------------------------------------
-%%% UNGROUPED TESTS
-%%%-------------------------------------------------------------------
-binary_key(_) ->
-    Key = <<"a">>,
-    <<$a, 0>> = ebson_encode:key(Key).
-    
-    
+
+complex_doc(_) ->
+    Doc = [{<<"a">>, 1.23}, 
+	   {<<"b">>, <<"bb">>}, 
+	   {<<"c">>, [{<<"aa">>, [<<"aaa">>, <<"bbb">>]}]}, 
+	   {<<"d">>, 50}, 
+	   {<<"e">>, 4235364546}],
+    Doc = ebson_decode:document(ebson_encode:document(Doc)).
+
