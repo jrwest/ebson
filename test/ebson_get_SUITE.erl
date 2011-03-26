@@ -25,7 +25,12 @@
 	 has_key_is_false_for_any_key_when_empty_bin_doc/1,
 	 has_key_is_true_for_first_key_in_bin_doc/1,
 	 has_key_is_true_for_any_existing_key_in_bin_doc/1,
-	 has_key_is_false_for_any_non_existing_key_in_bin_doc/1
+	 has_key_is_false_for_any_non_existing_key_in_bin_doc/1,
+
+	 %% UNGROUPED TESTS
+	 keys_from_empty_binary_doc/1,
+	 keys_from_one_key_binary_doc/1,
+	 keys_from_many_key_binary_doc/1
 	]).    
 
 %%%-------------------------------------------------------------------
@@ -46,7 +51,11 @@ groups() ->
        has_key_is_false_for_any_non_existing_key_in_bin_doc]}].
     
 all() -> 
-    [{group, encoded_values}, {group, encoded_has_key}].
+    [{group, encoded_values}, 
+     {group, encoded_has_key}, 
+     keys_from_empty_binary_doc, 
+     keys_from_one_key_binary_doc,
+     keys_from_many_key_binary_doc].
 
 
 %%%-------------------------------------------------------------------
@@ -98,3 +107,17 @@ has_key_is_false_for_any_non_existing_key_in_bin_doc(_) ->
     Doc = ebson:encode([{<<"a">>, 1}, {<<"b">>, 2}, {<<"c">>, 3}, {<<"d">>, 4}]),
     false = ebson_get:has_key(Key, Doc).
     
+%%%-------------------------------------------------------------------
+%%% UNGROUPED TESTS
+%%%-------------------------------------------------------------------
+keys_from_empty_binary_doc(_) ->
+    Doc = ebson:encode([]),
+    [] = ebson_get:keys(Doc).
+
+keys_from_one_key_binary_doc(_) ->
+    Doc = ebson:encode([{<<"a">>, 1}]),
+    [<<"a">>] = ebson_get:keys(Doc).
+
+keys_from_many_key_binary_doc(_) ->
+    Doc = ebson:encode([{<<"a">>, 1}, {<<"b">>, 2}, {<<"c">>, 3}, {<<"d">>, 4}]),
+    [<<"a">>, <<"b">>, <<"c">>, <<"d">>] = ebson_get:keys(Doc).
