@@ -10,6 +10,7 @@
 
 -export([document/1, field_flag/1, key/1, value/2]).
 -include("../include/ebson.hrl").
+-define(int_val (Val, Size), (Val):(Size)/little-signed-integer-unit:8).
 
 -spec document(ebson_pl_doc()) -> binary().
 document([]) ->
@@ -19,7 +20,7 @@ document(Doc) when is_list(Doc) ->
 
 document([], Bin) ->
     Size = byte_size(Bin)+5,
-    <<Size:1/little-signed-integer-unit:32, Bin/binary, 0>>;
+    <<?int_val(Size, 4), Bin/binary, 0>>;
 document([{Key, Val} | Doc], Bin) ->
     document(Doc, append_key_val(Key, Val, Bin)).
 
@@ -59,7 +60,7 @@ key(Key) when is_binary(Key) ->
     <<Key/binary, 0>>;
 key(Key) when is_list(Key) ->
     EncKey = list_to_binary(Key),
-    <<EncKey/binary, 0>>;
+    key(EncKey);
 key(Key) when is_integer(Key) ->
     key(integer_to_list(Key));
 key(Key) when is_atom(Key) ->
@@ -70,7 +71,7 @@ value(1, Val) ->
     <<Val:8/float-little-unit:8>>;
 value(2, Val) when is_binary(Val) ->
     StrSize = byte_size(Val) + 1,
-    <<StrSize:1/little-signed-integer-unit:32, Val/binary, 0>>;
+    <<?int_val(StrSize, 4), Val/binary, 0>>;
 value(2, Val) when is_list(Val) ->
     value(2, list_to_binary(Val));
 value(3, Val) ->
@@ -81,19 +82,19 @@ value(4, Val) ->
     document(lists:zip(lists:seq(0, length(Val)-1), Val));
 value(5, {binary, Val}) when is_binary(Val) ->
     BinSize = byte_size(Val),
-    <<BinSize:1/little-signed-integer-unit:32, 0, Val:BinSize/binary>>;
+    <<?int_val(BinSize, 4), 0, Val:BinSize/binary>>;
 value(8, true) ->
-    <<1:1/little-signed-integer-unit:8>>;
+    <<?int_val(1, 1)>>;
 value(8, false) ->
-    <<0:1/little-signed-integer-unit:8>>;
+    <<?int_val(0, 1)>>;
 value(9, {unix_time, Val}) ->
-    <<Val:8/little-signed-integer-unit:8>>;
+    <<?int_val(Val, 8)>>;
 value(10, undefined) ->
     <<>>;
 value(16, Val) ->
-    <<Val:4/little-signed-integer-unit:8>>;
+    <<?int_val(Val, 4)>>;
 value(18, Val) ->
-    <<Val:8/little-signed-integer-unit:8>>.
+    <<?int_val(Val, 8)>>.
 
 
 append_key_val(Key, Val, Bin) ->
@@ -101,4 +102,4 @@ append_key_val(Key, Val, Bin) ->
     FieldFlag = field_flag(Val),
     EncKey = key(Key),
     EncVal = value(FieldFlag, Val),
-    <<Bin:CurrentSize/binary-unit:8, FieldFlag:1/integer-little-signed-unit:8, EncKey/binary, EncVal/binary>>.
+    <<Bin:CurrentSize/binary-unit:8, ?int_val(FieldFlag, 1), EncKey/binary, EncVal/binary>>.
