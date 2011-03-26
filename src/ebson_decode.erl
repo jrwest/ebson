@@ -9,7 +9,9 @@
 -module(ebson_decode).
 
 -export([field_type/1, document/1, key/1, value/2]).
+-include("../include/ebson.hrl").
 
+-spec document(binary()) -> ebson_pl_doc().
 document(Bin) ->
     <<Size:32/integer-little-unit:1, Rest/binary>> = Bin,
     DocSize = Size-5,
@@ -23,6 +25,7 @@ document(<<TypeFlag:1/binary-unit:8, Rest/binary>>, Acc) ->
     {Decoded, Tail} = next_key_val(Type, Rest),
     document(Tail, [Decoded | Acc]).
 
+-spec field_type(binary()) -> ebson_field_type().			
 field_type(<<1, _/binary>>) ->
     float;
 field_type(<<2, _/binary>>) ->
@@ -46,6 +49,7 @@ field_type(<<18, _/binary>>) ->
 field_type(Bin) when is_binary(Bin) ->
     throw(ebson_unknown_fieldtype).
 
+-spec key(binary()) -> {binary(), binary()}.
 key(Bin) ->
     key(Bin, <<>>).
 
@@ -54,6 +58,7 @@ key(<<0, Rest/binary>>, Acc) ->
 key(<<Byte:1/unit:8, Rest/binary>>, Acc) ->
     key(Rest, <<Acc/binary, Byte>>).
 
+-spec value(ebson_field_type(), binary()) -> {term(), binary()}.
 value(float, <<Value:8/little-float-unit:8, Rest/binary>>) ->
     {Value, Rest};    
 value(string, <<Size:1/integer-little-unit:32, Str/binary>>) ->

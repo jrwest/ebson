@@ -9,9 +9,12 @@
 -module(ebson).
 
 -export([encode/1, decode/1]).
+-include("../include/ebson.hrl").
 
+-spec encode(ebson_pl_doc()) -> binary().		     
 encode(Doc) when is_list(Doc) ->
     ebson_encode:document(Doc).
 
+-spec decode(binary()) -> ebson_pl_doc().		  
 decode(Bin) when is_binary(Bin) ->
     ebson_decode:document(Bin).

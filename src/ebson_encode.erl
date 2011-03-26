@@ -9,7 +9,9 @@
 -module(ebson_encode).
 
 -export([document/1, field_flag/1, key/1, value/2]).
+-include("../include/ebson.hrl").
 
+-spec document(ebson_pl_doc()) -> binary().
 document([]) ->
     <<5, 0, 0, 0, 0>>;
 document(Doc) when is_list(Doc) ->
@@ -21,6 +23,7 @@ document([], Bin) ->
 document([{Key, Val} | Doc], Bin) ->
     document(Doc, append_key_val(Key, Val, Bin)).
 
+-spec field_flag(ebson_val()) -> 1 | 2 | 3 | 4 | 5 | 8 | 9 | 10 | 16 | 18.
 field_flag(Val) when is_float(Val) ->
     1;
 field_flag(Val) when is_binary(Val)
@@ -51,6 +54,7 @@ field_flag(Val) when is_integer(Val)
 field_flag(Val) when is_integer(Val) ->
     18.
 
+-spec key(binary() | [char()] | integer() | atom()) -> binary().
 key(Key) when is_binary(Key) ->
     <<Key/binary, 0>>;
 key(Key) when is_list(Key) ->
@@ -61,6 +65,7 @@ key(Key) when is_integer(Key) ->
 key(Key) when is_atom(Key) ->
     key(atom_to_list(Key)).
 
+-spec value(1 | 2 | 3 | 4 | 5 | 8 | 9 | 10 | 16 | 18, ebson_val()) -> binary().		    
 value(1, Val) ->
     <<Val:8/float-little-unit:8>>;
 value(2, Val) when is_binary(Val) ->
