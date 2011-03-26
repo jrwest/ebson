@@ -14,7 +14,9 @@
 
 value(_Key, ?EBSON_EMPTY_BINARY) ->
     undefined;
-value(Key, <<_Size:4/little-signed-integer-unit:8, Doc/binary>>) ->
+value(Key, <<Size:4/little-signed-integer-unit:8, Rest/binary>>) ->
+    DocSize = Size - 5,
+    <<Doc:DocSize/binary-unit:8, 0>> = Rest,
     get_value(Key, Doc).
 
 has_key(_Key, ?EBSON_EMPTY_BINARY) ->
@@ -24,7 +26,8 @@ has_key(Key, <<Size:4/little-signed-integer-unit:8, Rest/binary>>) ->
     <<Doc:DocSize/binary-unit:8, 0>> = Rest,
     do_has_key(Key, Doc).
 
-
+get_value(_Key, <<>>) ->
+    undefined;
 get_value(Key, <<TypeFlag:1/binary-unit:8, AtKey/binary>>) ->
     FieldType = ebson_decode:field_type(TypeFlag),
     case ebson_decode:key(AtKey) of
