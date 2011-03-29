@@ -8,54 +8,20 @@
 %%%-------------------------------------------------------------------
 -module(ebson_get_SUITE).
 
--include_lib("common_test/include/ct.hrl").
+-include_lib("easy_test/include/easy_test.hrl").
 
-%% common_test functions
--export([all/0, groups/0]).
+-easy_group([{group, encoded_values}, {tests, [value_from_empty_binary_doc,
+					       value_from_first_key_in_binary_doc,
+					       value_from_not_first_key_in_binary_doc,
+					       value_from_non_existing_key_in_binary_doc]}]).
+-easy_group([{group, encoded_has_key}, {tests, [has_key_is_false_for_any_key_when_empty_bin_doc,
+						has_key_is_true_for_first_key_in_bin_doc,
+						has_key_is_true_for_any_existing_key_in_bin_doc,
+						has_key_is_false_for_any_non_existing_key_in_bin_doc]}]).
 
-% tests
--export([
-	 %% ENCODED VALUES GROUP TESTS
-	 value_from_empty_binary_doc/1, 
-	 value_from_first_key_in_binary_doc/1,
-	 value_from_not_first_key_in_binary_doc/1,
-	 value_from_non_existing_key_in_binary_doc/1,
-
-	 %% ENCODED HAS KEY GROUP TESTS
-	 has_key_is_false_for_any_key_when_empty_bin_doc/1,
-	 has_key_is_true_for_first_key_in_bin_doc/1,
-	 has_key_is_true_for_any_existing_key_in_bin_doc/1,
-	 has_key_is_false_for_any_non_existing_key_in_bin_doc/1,
-
-	 %% UNGROUPED TESTS
-	 keys_from_empty_binary_doc/1,
-	 keys_from_one_key_binary_doc/1,
-	 keys_from_many_key_binary_doc/1
-	]).    
-
-%%%-------------------------------------------------------------------
-%%% COMMON TEST FUNCTIONS
-%%%-------------------------------------------------------------------
-groups() ->
-    [{encoded_values, 
-      [shuffle],
-      [value_from_empty_binary_doc,
-       value_from_first_key_in_binary_doc,
-       value_from_not_first_key_in_binary_doc,
-       value_from_non_existing_key_in_binary_doc]},
-     {encoded_has_key,
-      [shuffle],
-      [has_key_is_false_for_any_key_when_empty_bin_doc,
-       has_key_is_true_for_first_key_in_bin_doc,
-       has_key_is_true_for_any_existing_key_in_bin_doc,
-       has_key_is_false_for_any_non_existing_key_in_bin_doc]}].
-    
-all() -> 
-    [{group, encoded_values}, 
-     {group, encoded_has_key}, 
-     keys_from_empty_binary_doc, 
-     keys_from_one_key_binary_doc,
-     keys_from_many_key_binary_doc].
+-easy_test([{test, keys_from_empty_binary_doc}]).
+-easy_test([{test, keys_from_one_key_binary_doc}]).
+-easy_test([{test, keys_from_many_key_binary_doc}]).
 
 
 %%%-------------------------------------------------------------------

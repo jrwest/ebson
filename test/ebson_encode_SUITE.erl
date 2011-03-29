@@ -8,83 +8,19 @@
 %%%-------------------------------------------------------------------
 -module(ebson_encode_SUITE).
 
--include_lib("common_test/include/ct.hrl").
+-include_lib("easy_test/include/easy_test.hrl").
 
-%% common_test functions
--export([all/0, groups/0]).
-
-%% tests
--export([
-	 %% DOCUMENTS GROUP TESTS
-	 empty_doc/1, 
-	 one_key_doc/1,
-	 three_key_doc/1,
-	 complex_doc/1,
-
-	 %% DETECTS GROUP TESTS
-	 detect_float/1,
-	 detect_string_binary/1,
-	 detect_string_list/1,
-	 detect_document/1,
-	 detect_implicit_array/1,
-	 detect_explicit_array/1,
-	 detect_binary/1,
-	 detect_bool_t/1,
-	 detect_bool_f/1,
-	 detect_unix_time/1,
-	 detect_null/1,
-	 detect_int32/1,
-	 detect_int64/1,
-
-	 %% VALUES GROUP TESTS
-	 float_val/1,
-	 string_binary_val/1,
-	 string_list_val/1,
-	 binary_val/1,
-	 bool_t_val/1,
-	 bool_f_val/1,
-	 unix_time_val/1,
-	 null_val/1,
-	 int32_val/1,
-	 int64_val/1,
-	 document_val/1,
-	 implicit_array_val/1,
-	 explicit_array_val/1,
-
-	 %% KEYS GROUP TESTS
-	 binary_key/1,
-	 list_key/1,
-	 integer_key/1,
-	 atom_key/1
-	]).
-
-%%%-------------------------------------------------------------------
-%%% COMMON TEST FUNCTIONS
-%%%-------------------------------------------------------------------
-groups() ->
-    [{keys, 
-      [shuffle],
-      [binary_key, list_key, integer_key, atom_key]},
-     {values,
-      [shuffle],
-      [float_val, string_binary_val, string_list_val,
-       binary_val, bool_t_val, bool_f_val, unix_time_val,
-       null_val, int32_val, int64_val,
-       document_val, implicit_array_val, explicit_array_val]},
-     {detects, 
-      [shuffle],
-      [detect_float, detect_string_binary, detect_string_list,
-       detect_document, detect_implicit_array, detect_explicit_array,
-       detect_binary, detect_bool_t, detect_bool_f,
-       detect_unix_time, detect_null, detect_int32,
-       detect_int64]},
-     {documents,
-      [shuffle],
-      [empty_doc, one_key_doc, three_key_doc, complex_doc]}].
-
-all() ->
-    [{group, keys}, {group, detects}, {group, values}, {group, documents}].    
-
+-easy_group([{group, keys}, {tests, [binary_key, list_key, integer_key, atom_key]}]).
+-easy_group([{group, detects}, {tests, [detect_float, detect_string_binary, detect_string_list,
+					detect_document, detect_implicit_array, detect_explicit_array,
+					detect_binary, detect_bool_t, detect_bool_f,
+					detect_unix_time, detect_null, detect_int32,
+					detect_int64]}]).
+-easy_group([{group, values}, {tests, [float_val, string_binary_val, string_list_val,
+				       binary_val, bool_t_val, bool_f_val, unix_time_val,
+				       null_val, int32_val, int64_val,
+				       document_val, implicit_array_val, explicit_array_val]}]).
+-easy_group([{group, documents}, {tests, [empty_doc, one_key_doc, three_key_doc, complex_doc]}]).
 
 %%%-------------------------------------------------------------------
 %%% KEYS TESTS

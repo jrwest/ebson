@@ -8,70 +8,20 @@
 %%%-------------------------------------------------------------------
 -module(ebson_decode_SUITE).
 
--include_lib("common_test/include/ct.hrl").
+-include_lib("easy_test/include/easy_test.hrl").
 
-%% common_test functions
--export([all/0, groups/0]).
+-easy_group([{group, detects}, {tests, [detect_double, detect_string, detect_document, 
+					detect_array, detect_binary, detect_bool, 
+					detect_utc, detect_null, detect_int32, detect_int64]}]).
 
-%% tests
--export([
-	 %% DOCUMENTS GROUP TESTS
-	 empty_doc/1, 
-	 one_key_doc/1,
-	 three_key_doc/1,
-	 complex_doc/1,
+-easy_group([{group, values}, {tests, [decode_string, decode_double, decode_binary, 
+				       decode_bool_t, decode_bool_f, decode_utc,
+				       decode_null, decode_int32, decode_int64, 
+				       decode_document, decode_array]}]).
 
-	 %% DETECTS GROUP TESTS
-	 detect_double/1, 
-	 detect_string/1, 
-	 detect_document/1,
-	 detect_array/1,
-	 detect_binary/1,
-	 detect_bool/1,
-	 detect_utc/1,
-	 detect_null/1,
-	 detect_int32/1,
-	 detect_int64/1,
-	 
-	 %% VALUES GROUP TESTS
-	 decode_double/1,
-	 decode_string/1,
-	 decode_binary/1,
-	 decode_bool_t/1,
-	 decode_bool_f/1,
-	 decode_utc/1,
-	 decode_null/1,
-	 decode_int32/1,
-	 decode_int64/1,
-	 decode_document/1,
-	 decode_array/1,
+-easy_test([{test, valid_key}]).
 
-	 %% NON-GROUPED TESTS
-	 valid_key/1
-	]).
-
-%%%-------------------------------------------------------------------
-%%% COMMON TEST FUNCTIONS
-%%%-------------------------------------------------------------------
-groups() ->
-    [{detects,
-      [shuffle],
-      [detect_double, detect_string, detect_document, 
-       detect_array, detect_binary, detect_bool, 
-       detect_utc, detect_null, detect_int32, detect_int64]},
-     {values, 
-      [shuffle],
-      [decode_string, decode_double, decode_binary, 
-       decode_bool_t, decode_bool_f, decode_utc,
-       decode_null, decode_int32, decode_int64, 
-       decode_document, decode_array]},
-     {documents, 
-      [shuffle],
-      [empty_doc, one_key_doc, three_key_doc, complex_doc]}].
-
-all() ->
-    [{group, detects}, {group, values}, valid_key, {group, documents}].
-
+-easy_group([{group, documents}, {tests, [empty_doc, one_key_doc, three_key_doc, complex_doc]}]).
 
 %%%-------------------------------------------------------------------
 %%% DETECTS TESTS
