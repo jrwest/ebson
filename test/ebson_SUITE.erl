@@ -8,18 +8,15 @@
 %%%-------------------------------------------------------------------
 -module(ebson_SUITE).
 
--include_lib("common_test/include/ct.hrl").
+-include_lib("easy_test/include/easy_test.hrl").
 -include_lib("proper/include/proper.hrl").
 
--export([all/0, doc/0]).
+-export([doc/0]).
+-export([prop_identity/0]).
 -export([init_per_suite/1, end_per_suite/1]).
--export([identity/1, 
-	 prop_identity/0]).
+
 
 -define(EBSON_PROP_IDENTITY_RUNS, 5000).
-
-all() ->
-    [identity].
 
 init_per_suite(Config) ->
     {A,B,C} = now(),
@@ -29,7 +26,7 @@ init_per_suite(Config) ->
 end_per_suite(Config) ->
     ok.
 
-identity(_) ->
+test_identity(_) ->
     true = proper:quickcheck(prop_identity(), ?EBSON_PROP_IDENTITY_RUNS).
 
 % THIS PROPERTY PURPOSEFULLY SKIPS THE EMPTY DOC CASE
