@@ -14,6 +14,11 @@
 					       value_from_first_key_in_binary_doc,
 					       value_from_not_first_key_in_binary_doc,
 					       value_from_non_existing_key_in_binary_doc]}]).
+
+-easy_group([{group, decoded_values}, {tests, [value_from_empty_list_doc,
+					       value_from_first_key_in_list_doc,
+					       value_from_not_first_key_in_list_doc]}]).
+
 -easy_group([{group, encoded_has_key}, {tests, [has_key_is_false_for_any_key_when_empty_bin_doc,
 						has_key_is_true_for_first_key_in_bin_doc,
 						has_key_is_true_for_any_existing_key_in_bin_doc,
@@ -50,6 +55,26 @@ value_from_non_existing_key_in_binary_doc(_) ->
     Key = <<"e">>,
     Doc = ebson:encode([{<<"a">>, 1}, {<<"b">>, 2}, {<<"c">>, 3}, {<<"d">>, 4}]),
     undefined = ebson_get:value(Key, Doc).
+
+%%%-------------------------------------------------------------------
+%%% DECODED VALUES TESTS
+%%%-------------------------------------------------------------------
+value_from_empty_list_doc(_) ->
+    Key = <<"a">>,
+    Doc = [],
+    undefined = ebson_get:value(Key, Doc).
+
+value_from_first_key_in_list_doc(_) ->
+    Key = <<"a">>,
+    Val = 1,
+    Doc = [{Key, Val}],
+    Val = ebson_get:value(Key, Doc).
+
+value_from_not_first_key_in_list_doc(_) ->
+    Key = <<"c">>,
+    Val = 3,
+    Doc = [{<<"a">>, 1}, {<<"b">>, 2}, {Key, Val}, {<<"d">>, 4}],
+    Val = ebson_get:value(Key, Doc).
 
 %%%-------------------------------------------------------------------
 %%% ENCODED HAS KEY TESTS

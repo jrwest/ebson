@@ -14,9 +14,12 @@
 
 value(_Key, ?EBSON_EMPTY_BINARY) ->
     undefined;
-value(Key, Bin) ->
+value(Key, Bin) when is_binary(Bin) ->
     Doc = strip_doc(Bin),
-    get_value(Key, Doc).
+    get_encoded_value(Key, Doc);
+value(Key, List) when is_list(List) ->
+    get_decoded_value(Key, List).
+
 
 has_key(_Key, ?EBSON_EMPTY_BINARY) ->
     false;
@@ -35,9 +38,9 @@ doc_size(Bin) when is_binary(Bin) ->
     <<Size:1/little-signed-integer-unit:32, _/binary>> = Bin,
     Size.
 
-get_value(_Key, <<>>) ->
+get_encoded_value(_Key, <<>>) ->
     undefined;
-get_value(Key, <<TypeFlag:1/binary-unit:8, AtKey/binary>>) ->
+get_encoded_value(Key, <<TypeFlag:1/binary-unit:8, AtKey/binary>>) ->
     FieldType = ebson_decode:field_type(TypeFlag),
     case ebson_decode:key(AtKey) of
 	{Key, AtValue} ->
@@ -45,8 +48,16 @@ get_value(Key, <<TypeFlag:1/binary-unit:8, AtKey/binary>>) ->
 	    Value;
 	{_, AtValue} ->
 	    AtNextFlag = skip_value(FieldType, AtValue),
-	    get_value(Key, AtNextFlag)
+	    get_encoded_value(Key, AtNextFlag)
     end.
+
+get_decoded_value(_K, []) ->
+    undefined;
+get_decoded_value(Key, [{Key, Val} | _]) ->
+    Val;
+get_decoded_value(Key, [ _ | Rest ]) ->
+    get_decoded_value(Key, Rest).
+
 
 do_has_key(_Key, <<>>) ->
     false;
