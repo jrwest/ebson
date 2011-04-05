@@ -27,6 +27,6 @@ doc_size(Bin) ->
 has_key(Key, Bin) when is_binary(Key) andalso is_binary(Bin) ->
     ebson_get:has_key(Key, Bin).
 
--spec get_value(binary(), binary()) -> any().
-get_value(Key, Bin) when is_binary(Key) andalso is_binary(Bin) ->
-    ebson_get:value(Key, Bin).
+-spec get_value(binary(), binary() | list()) -> any().
+get_value(Key, Doc) when is_binary(Key) ->
+    ebson_get:value(Key, Doc).
