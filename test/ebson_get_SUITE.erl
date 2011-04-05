@@ -23,6 +23,8 @@
 -easy_test([{test, keys_from_one_key_binary_doc}]).
 -easy_test([{test, keys_from_many_key_binary_doc}]).
 
+-easy_test([{test, doc_size_from_binary}]).
+
 
 %%%-------------------------------------------------------------------
 %%% ENCODED VALUES TESTS
@@ -87,3 +89,7 @@ keys_from_one_key_binary_doc(_) ->
 keys_from_many_key_binary_doc(_) ->
     Doc = ebson:encode([{<<"a">>, 1}, {<<"b">>, 2}, {<<"c">>, 3}, {<<"d">>, 4}]),
     [<<"a">>, <<"b">>, <<"c">>, <<"d">>] = ebson_get:keys(Doc).
+
+doc_size_from_binary(_) ->
+    Doc = <<5, 0, 0, 0, 0>>,
+    5 = ebson_get:doc_size(Doc).

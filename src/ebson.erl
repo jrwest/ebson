@@ -8,7 +8,7 @@
 %%%-------------------------------------------------------------------
 -module(ebson).
 
--export([encode/1, decode/1]).
+-export([encode/1, decode/1, doc_size/1]).
 -include("../include/ebson.hrl").
 
 -spec encode(ebson_pl_doc()) -> binary().		     
@@ -18,3 +18,7 @@ encode(Doc) when is_list(Doc) ->
 -spec decode(binary()) -> ebson_pl_doc().		  
 decode(Bin) when is_binary(Bin) ->
     ebson_decode:document(Bin).
+
+-spec doc_size(binary()) -> integer().
+doc_size(Bin) ->
+    ebson_get:doc_size(Bin).

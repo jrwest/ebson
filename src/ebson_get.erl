@@ -8,7 +8,7 @@
 %%%-------------------------------------------------------------------
 -module(ebson_get).
 
--export([value/2, has_key/2, keys/1]).
+-export([value/2, has_key/2, keys/1, doc_size/1]).
 
 -define(EBSON_EMPTY_BINARY, <<5, 0, 0, 0, 0>>).
 
@@ -30,6 +30,10 @@ keys(?EBSON_EMPTY_BINARY) ->
 keys(Bin) ->
     Doc = strip_doc(Bin),
     get_keys(Doc, []).
+
+doc_size(Bin) when is_binary(Bin) ->
+    <<Size:1/little-signed-integer-unit:32, _/binary>> = Bin,
+    Size.
 
 get_value(_Key, <<>>) ->
     undefined;
