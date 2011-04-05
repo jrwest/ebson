@@ -8,7 +8,7 @@
 %%%-------------------------------------------------------------------
 -module(ebson).
 
--export([encode/1, decode/1, doc_size/1, has_key/2]).
+-export([encode/1, decode/1, doc_size/1, has_key/2, get_value/2]).
 -include("../include/ebson.hrl").
 
 -spec encode(ebson_pl_doc()) -> binary().		     
@@ -26,3 +26,7 @@ doc_size(Bin) ->
 -spec has_key(binary(), binary()) -> boolean().
 has_key(Key, Bin) when is_binary(Key) andalso is_binary(Bin) ->
     ebson_get:has_key(Key, Bin).
+
+-spec get_value(binary(), binary()) -> any().
+get_value(Key, Bin) when is_binary(Key) andalso is_binary(Bin) ->
+    ebson_get:value(Key, Bin).
