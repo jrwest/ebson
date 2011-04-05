@@ -23,8 +23,8 @@ decode(Bin) when is_binary(Bin) ->
 doc_size(Bin) ->
     ebson_get:doc_size(Bin).
 
--spec has_key(binary(), binary()) -> boolean().
-has_key(Key, Bin) when is_binary(Key) andalso is_binary(Bin) ->
+-spec has_key(binary(), binary() | list()) -> boolean().
+has_key(Key, Bin) when is_binary(Key) ->
     ebson_get:has_key(Key, Bin).
 
 -spec get_value(binary(), binary() | list()) -> any().

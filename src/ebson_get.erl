@@ -23,9 +23,11 @@ value(Key, List) when is_list(List) ->
 
 has_key(_Key, ?EBSON_EMPTY_BINARY) ->
     false;
-has_key(Key, Bin) ->
+has_key(Key, Bin) when is_binary(Bin)->
     Doc = strip_doc(Bin),
-    do_has_key(Key, Doc).
+    do_encoded_has_key(Key, Doc);
+has_key(Key, List) when is_list(List) ->
+    do_decoded_has_key(Key, List).
 
 
 keys(?EBSON_EMPTY_BINARY) ->
@@ -59,17 +61,25 @@ get_decoded_value(Key, [ _ | Rest ]) ->
     get_decoded_value(Key, Rest).
 
 
-do_has_key(_Key, <<>>) ->
+do_encoded_has_key(_Key, <<>>) ->
     false;
-do_has_key(Key, <<TypeFlag:1/binary-unit:8, AtKey/binary>>) ->
+do_encoded_has_key(Key, <<TypeFlag:1/binary-unit:8, AtKey/binary>>) ->
     FieldType = ebson_decode:field_type(TypeFlag),
     case ebson_decode:key(AtKey) of
 	{Key, _} ->
 	    true;
 	{_, AtValue} ->
 	    AtNextFlag = skip_value(FieldType, AtValue),
-	    do_has_key(Key, AtNextFlag)
+	    do_encoded_has_key(Key, AtNextFlag)
     end.
+
+do_decoded_has_key(_Key, []) ->
+    false;
+do_decoded_has_key(Key, [{Key, _} | _]) ->
+    true;
+do_decoded_has_key(Key, [_ | Rest]) ->
+    do_decoded_has_key(Key, Rest).
+
 
 get_keys(<<>>, Acc) ->
     lists:reverse(Acc);    
